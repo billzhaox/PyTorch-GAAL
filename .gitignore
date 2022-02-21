@@ -1,0 +1,6 @@
+just_for_test.py
+plot/
+data/
+__pycache__/
+*.pyc
+.idea/
