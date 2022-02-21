@@ -14,7 +14,7 @@ Jia-Jie Zhu and Jose Bento. Generative adversarial active learning. arXiv prepri
  |__ main.py		# Generate commmand to run train.py
  |__ train.py		# main training loop
  |__ utils.py		# toolbox
- |__ requirements.txt       # store dependencies, usage: pip install -r requirements.txt
+ |__ requirements.txt       # auto-generated dependencies file, usage: pip install -r requirements.txt
  |__ README.md
 ```
 
