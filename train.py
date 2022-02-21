@@ -45,17 +45,17 @@ elif args.dset == 'USPS':
         test_data.append(res)
     test_data = np.reshape(test_data, (len(test_data), -1))
 
-# randomly select 50, and throw away other labels
+##################################################################
+
+# randomly select 50 data as the initial labeled dataset
 l = random.sample(range(dataset.data.shape[0]), 50)
-l_env = [i for i in range(dataset.data.shape[0]) if i not in l]
 labeled_data = dataset.data[l]
 # print(labeled_data.shape) # [50, 784]
 labeled_targets = dataset.targets[l]
 # print(labeled_targets.shape) # [50]
-# dataset.data, dataset.targets = dataset.data[l_env], dataset.targets[l_env]
-unlabeled_set = dataset.data[l_env]
+
 num_label = 50
-# init SVM
+# init linear SVM
 clf = svm.SVC(kernel='linear', gamma=0.001)
 acc_hist = []
 numlabel_hist = []
@@ -65,7 +65,7 @@ def train_svm():
     W = clf.coef_[0]  # W consists of 28*28=784 elements
     b = clf.intercept_[0]  # b consists of 1 element
     W_tensor = torch.from_numpy(W).float().to(device)
-    W_tensor.requires_grad_(True)
+    W_tensor.requires_grad_(False)
     pred_labels = clf.predict(test_data)
     acc = accuracy_score(test_targets, pred_labels)
     # print(acc)
@@ -75,13 +75,7 @@ def train_svm():
     # plt.show()
     return W_tensor, b
 
-
 svm_W_tensor, svm_b = train_svm()
-
-
-# print(pred_labels.shape)
-
-# # print('data_size: {}, batch_size: {}, latent_size: {}'.format(data_size, batch_size, latent_size))
 
 # Load generator G
 ngpu = 1
@@ -102,11 +96,10 @@ gen.eval()
 #         axs[0, i].imshow(np.asarray(img))
 #         axs[0, i].set(xticklabels=[], yticklabels=[], xticks=[], yticks=[])
 
-
-
 # print(input)
 # grid = vutils.make_grid(fake, padding=2, normalize=True)
 # show(grid)
+
 
 # loss function we want to optimize
 def loss_op(z):
@@ -117,7 +110,7 @@ def loss_op(z):
     return torch.abs(loss)
 
 
-# Load oracle classifer
+# Load oracle classifier
 ora = CNN()
 device_type = "GPU" if torch.cuda.is_available() else "CPU"
 ora.load_state_dict(torch.load("./oracle/CNN_mnist57.pth".format(device_type)))
@@ -152,6 +145,7 @@ while num_label < limit:
         zz = torch.randn(1, 100, 1, 1, device=device, requires_grad=True)
         org_loss_list.append(float(loss_op(zz)))
         optimizer = torch.optim.SGD([zz], lr=1., momentum=0.9)
+        # optimizer = torch.optim.Adam([zz], lr=10.)
         for i in range(iterr):
             loss = loss_op(zz)
             history.append(loss.detach().cpu().clone().numpy())
@@ -181,6 +175,6 @@ while num_label < limit:
     # re-train the SVM, update W and b
     svm_W_tensor, svm_b = train_svm()
 
-plot(numlabel_hist, acc_hist, args.dset)
+plot(numlabel_hist, acc_hist, args.dset, args,limit)
 
 
