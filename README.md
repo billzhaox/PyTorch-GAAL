@@ -26,7 +26,7 @@ python main.py
 
 ## My Environment (For your reference).
 ```
-pytorch 1.9.0 + torchvision 0.10.0 + cuda 10.1 + cuDNN 7.6.5
+python 3.9.7 + pytorch 1.9.0 + torchvision 0.10.0 + cuda 10.1 + cuDNN 7.6.5
 ```
 
 ## To be updated
