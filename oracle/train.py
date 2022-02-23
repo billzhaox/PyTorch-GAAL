@@ -35,18 +35,13 @@ def train(epoch):
         images, labels = data
         images, labels = images.to(device), labels.to(device)
 
-        # 梯度清零
         optimizer.zero_grad()
-        # 正向传播
         outputs = model(images)
         _, predicted = torch.max(outputs.data, dim=1)
         total_correct += torch.eq(predicted, labels).sum().item()
-        # 计算损失
         loss = criterion(outputs, labels)
         total_loss += loss.item()
-        # 反向传播
         loss.backward()
-        # 权重更新
         optimizer.step()
 
         total_data += labels.size(0)
@@ -56,7 +51,6 @@ def train(epoch):
                                                                                args.epochs,
                                                                                loss,
                                                                                iteration)
-    # 更新学习率
     scheduler.step()
     print(optimizer.state_dict()['param_groups'][0]['lr'])
 
@@ -68,7 +62,6 @@ def train(epoch):
     print('accuracy on train set:%d %%' % acc)
 
 
-# 验证函数
 def validate(epoch):
     total_loss = 0
     total_correct = 0
@@ -78,18 +71,15 @@ def validate(epoch):
         for data in test_bar:
             images, labels = data
             images, labels = images.to(device), labels.to(device)
-            # 正向传播
             outputs = model(images)
             _, predicted = torch.max(outputs.data, dim=1)
             total_correct += torch.eq(predicted, labels).sum().item()
 
-            # 计算损失
             loss = criterion(outputs, labels)
             total_loss += loss.item()
 
             total_data += labels.size(0)
 
-            # 进度条描述训练进度
             test_bar.desc = "validate epoch[{}/{}]".format(epoch + 1,
                                                            args.epochs)
 
@@ -107,32 +97,26 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("using {} device.".format(device))
 
-    # 由于神经网络中数据对象为tensor，所以需要用transform将普通数据转换为tensor
-    transform = transforms.Compose([
+    transform = f.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
     ])
 
-    # 训练数据集，torchvision中封装了数据集的下载方式，调用下面函数就会自动下载
     train_dataset = datasets.MNIST(root='../data/', train=True, download=True, transform=transform)
     idx = (train_dataset.targets == 5) | (train_dataset.targets == 7)
     train_dataset.data, train_dataset.targets = train_dataset.data[idx], train_dataset.targets[idx]
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
 
-    # 测试数据集
     test_dataset = datasets.MNIST(root='../dataset/', train=False, download=True, transform=transform)
     idx = (test_dataset.targets == 5) | (test_dataset.targets == 7)
     test_dataset.data, test_dataset.targets = test_dataset.data[idx], test_dataset.targets[idx]
     test_loader = DataLoader(test_dataset, shuffle=False, batch_size=args.batch_size)
 
-    # 生成神经网络实例
     model = CNN()
     model.to(device)
 
-    # 损失函数和优化器
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    # 设置动态学习率
     scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
 
     train_loss = []
