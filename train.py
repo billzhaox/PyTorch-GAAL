@@ -54,6 +54,7 @@ class TrainLoop:
         W_tensor = torch.from_numpy(W).float().to(self.device)
         W_tensor.requires_grad_(False)
         pred_labels = clf.predict(self.test_data)
+        # print(pred_labels)
         acc = accuracy_score(self.test_targets, pred_labels)
         # print(acc)
         # plt.plot(numlabel_hist,acc_hist,'o-')
@@ -167,27 +168,31 @@ if __name__ == '__main__':
 
     dataroot = 'data/'
     # MNIST 5 and 7 TODO: CIFAR-10 & Automobile And Horse
-    dataset = dset.MNIST(root=dataroot, transform=transforms.ToTensor(), download=True)
+    dataset = dset.MNIST(root=dataroot, download=True)
     idx = (dataset.targets == 5) | (dataset.targets == 7)
-    dataset.data, dataset.targets = torch.flatten(dataset.data[idx], start_dim=1), dataset.targets[idx]
+    dataset.data, dataset.targets = torch.flatten(dataset.data[idx], start_dim=1) / 255.0, dataset.targets[idx]
     # print(dataset.data.shape)
 
     if args.dset == 'mnist57':
-        test_dataset = dset.MNIST(root=dataroot, train=False, download=True, transform=transforms.ToTensor())
+        test_dataset = dset.MNIST(root=dataroot, train=False, download=True)
         idx = (test_dataset.targets == 5) | (test_dataset.targets == 7)
-        test_data, test_targets = torch.flatten(test_dataset.data[idx], start_dim=1), test_dataset.targets[idx]
+        test_data, test_targets = torch.flatten(test_dataset.data[idx], start_dim=1) / 255.0, test_dataset.targets[idx]
         # print(test_dataset.data.shape)  # [1920, 784]
     elif args.dset == 'USPS':
-        test_dataset2 = dset.USPS(root=dataroot, train=True, download=True, transform=transforms.ToTensor())
+        test_dataset2 = dset.USPS(root=dataroot, train=False, download=True)
         idx = [i for i in range(len(test_dataset2.targets)) if
                test_dataset2.targets[i] == 5 or test_dataset2.targets[i] == 7]
         test_dataset2.data, test_targets = np.take(test_dataset2.data, idx, 0), np.take(test_dataset2.targets, idx,
                                                                                         0)
-        test_data = []
-        newsize = (28, 28)
+        # print(test_targets)
+        trans = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Resize([28, 28])
+        ])
+        test_data = torch.empty(len(test_dataset2.data),28,28)
         for i in range(len(test_dataset2.data)):
-            res = cv2.resize(test_dataset2.data[i].copy(), dsize=newsize, interpolation=cv2.INTER_CUBIC)
-            test_data.append(res)
+            res = trans(test_dataset2.data[i])
+            test_data[i] = res.clone()
         test_data = np.reshape(test_data, (len(test_data), -1))
 
     ##################################################################
@@ -214,5 +219,11 @@ if __name__ == '__main__':
         full_acc, a, b = oneTrain.train_svm(dataset.data, dataset.targets)
         full_list.append(full_acc)
 
-    plot_all(total_numlabel, gaal_list, random_list,full_list, args.dset, args.limit, id)
+    plot_all(total_numlabel, gaal_list, random_list, full_list, args.dset, args.limit, id)
     # plot_err(total_numlabel, aver, sd, args.dset, args.limit, id)
+
+    # oneTrain = TrainLoop(args, device, labeled_data, labeled_targets, test_data, test_targets, id)
+    #
+    # full_acc, a, b = oneTrain.train_svm(dataset.data, dataset.targets)
+    # # print(dataset.data.shape)
+    # print(full_acc)
