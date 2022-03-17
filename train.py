@@ -3,9 +3,12 @@ import numpy as np
 import torch
 import torchvision.transforms.functional as F
 import torchvision.datasets as dset
+from torch.backends import cudnn
+
 from utils import parse_args, plot, plot_err, plot_all, generate_run_id
 from gan.dcgan import Generator
 from oracle.cnn import CNN
+from oracle.dla_simple import SimpleDLA
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 from sklearn import svm
@@ -35,16 +38,34 @@ class TrainLoop:
 
         _, self.svm_W_tensor, self.svm_b = self.train_svm(init_labeled_data, init_labeled_targets)
 
-        # Load generator G
-        ngpu = 1
-        self.gen = Generator(ngpu).to(self.device)
-        self.gen.load_state_dict(torch.load('./gan/generator/G.pth'))
-        self.gen.eval()
-
-        # Load oracle classifier
-        self.ora = CNN()
         device_type = "GPU" if torch.cuda.is_available() else "CPU"
-        self.ora.load_state_dict(torch.load("./oracle/CNN_mnist57.pth".format(device_type)))
+        if args.dset == 'mnist57' or args.dset == 'USPS':
+            # Load generator G
+            ngpu = 1
+            self.gen = Generator(ngpu, mode=0).to(self.device)
+            self.gen.load_state_dict(torch.load("./gan/generator/G_MNIST.pth".format(device_type)))
+            self.gen.eval()
+
+            # Load oracle classifier
+            self.ora = CNN()
+            device_type = "GPU" if torch.cuda.is_available() else "CPU"
+            self.ora.load_state_dict(torch.load("./oracle/CNN_mnist57.pth".format(device_type)))
+            self.ora.eval()
+        elif args.dset == 'CIFAR10':
+            # Load generator G
+            ngpu = 1
+            self.gen = Generator(ngpu, mode=1).to(self.device)
+            self.gen.load_state_dict(torch.load("./gan/generator/G_CIFAR.pth".format(device_type)))
+            self.gen.eval()
+
+            # Load oracle classifier
+            self.ora = SimpleDLA().to(self.device)
+            if device_type == "GPU":
+                self.ora = torch.nn.DataParallel(self.ora)
+                cudnn.benchmark = True
+            checkpoint = torch.load('./oracle/ORA_CIFAR.pth')
+            self.ora.load_state_dict(checkpoint['net'])
+            self.ora.eval()
 
     def train_svm(self, x, y):
         clf = svm.SVC(kernel='linear', gamma=0.001)
@@ -56,7 +77,6 @@ class TrainLoop:
         pred_labels = clf.predict(self.test_data)
         # print(pred_labels)
         acc = accuracy_score(self.test_targets, pred_labels)
-        # print(acc)
         # plt.plot(numlabel_hist,acc_hist,'o-')
         # plt.show()
         return acc, W_tensor, b
@@ -98,15 +118,15 @@ class TrainLoop:
                     cnt += 1
 
                 # optimizer = torch.optim.SGD([zz], lr=1., momentum=0.9)
-                # # optimizer = torch.optim.Adam([zz2], lr=1.)
+                # optimizer = torch.optim.Adam([zz], lr=0.1)
                 # for i in range(iterr):
-                #     loss = loss_op(zz)
-                #     history.append(loss.detach().cpu().clone().numpy())
+                #     loss = self.loss_op(zz)
+                #     # history.append(loss.detach().cpu().clone().numpy())
                 #     optimizer.zero_grad()
                 #     loss.backward()
                 #     optimizer.step()
                 # z_list.append(zz)
-                # loss_list.append(float(loss_op(zz)))
+                # loss_list.append(float(self.loss_op(zz)))
             # print(z_list)
             print("Generated 10 samples")
             print(org_loss_list)
@@ -116,9 +136,13 @@ class TrainLoop:
             # Generate samples using z_list, label them, add them to the labeled dataset
             for z in z_list:
                 fake = self.gen(z)
-                fake_flatten = torch.flatten(torch.squeeze(fake, 0), start_dim=1)
+                fake_flatten = torch.flatten(fake, start_dim=1)
                 out = self.ora(fake.detach().cpu())
                 label = out.data.max(1)[1]
+                # debug
+                print("label:",label)
+                plt.imshow(np.transpose(torch.squeeze(fake, 0).detach().cpu(), (1, 2, 0)))
+                plt.show()
                 # TODO: prob > threshold?
                 self.labeled_data_gaal = torch.cat((self.labeled_data_gaal, fake_flatten.detach().cpu()))
                 self.labeled_targets_gaal = torch.cat((self.labeled_targets_gaal, torch.tensor([label])))
@@ -167,16 +191,28 @@ if __name__ == '__main__':
     ################### Prepare data #################################
 
     dataroot = 'data/'
-    # MNIST 5 and 7 TODO: CIFAR-10 & Automobile And Horse
-    dataset = dset.MNIST(root=dataroot, download=True)
-    idx = (dataset.targets == 5) | (dataset.targets == 7)
-    dataset.data, dataset.targets = torch.flatten(dataset.data[idx], start_dim=1) / 255.0, dataset.targets[idx]
-    # print(dataset.data.shape)
+    if args.dset == 'mnist57' or args.dset == 'USPS':
+        dataset = dset.MNIST(root=dataroot, download=True)
+        idx = (dataset.targets == 5) | (dataset.targets == 7)
+        dataset.data, dataset.targets = torch.flatten(dataset.data[idx], start_dim=1) / 255.0, dataset.targets[idx]
+        for i in range(len(dataset.targets)):
+            dataset.targets[i] = 0 if dataset.targets[i] == 5 else 1
+    elif args.dset == 'CIFAR10':
+        dataset = dset.CIFAR10(root=dataroot, train=True, download=True)
+        idx = [i for i in range(len(dataset.targets)) if dataset.targets[i] == 1 or dataset.targets[i] == 7]
+        dataset.data, dataset.targets = np.take(dataset.data, idx, 0), np.take(dataset.targets, idx, 0)
+        for i in range(len(dataset.targets)):
+            dataset.targets[i] = 0 if dataset.targets[i] == 1 else 1
+        # print(dataset.data.shape)
+        # print(dataset.data[0])
+        dataset.data = np.reshape(dataset.data, (len(dataset.data), -1)) / 255.0
 
     if args.dset == 'mnist57':
         test_dataset = dset.MNIST(root=dataroot, train=False, download=True)
         idx = (test_dataset.targets == 5) | (test_dataset.targets == 7)
         test_data, test_targets = torch.flatten(test_dataset.data[idx], start_dim=1) / 255.0, test_dataset.targets[idx]
+        for i in range(len(test_targets)):
+            test_targets[i] = 0 if test_targets[i] == 5 else 1
         # print(test_dataset.data.shape)  # [1920, 784]
     elif args.dset == 'USPS':
         test_dataset2 = dset.USPS(root=dataroot, train=False, download=True)
@@ -194,6 +230,15 @@ if __name__ == '__main__':
             res = trans(test_dataset2.data[i])
             test_data[i] = res.clone()
         test_data = np.reshape(test_data, (len(test_data), -1))
+        for i in range(len(test_targets)):
+            test_targets[i] = 0 if test_targets[i] == 5 else 1
+    elif args.dset == 'CIFAR10':
+        test_dataset = dset.CIFAR10(root=dataroot, train=True, download=True)
+        idx = [i for i in range(len(test_dataset.targets)) if test_dataset.targets[i] == 1 or test_dataset.targets[i] == 7]
+        test_data, test_targets = np.take(test_dataset.data, idx, 0), np.take(test_dataset.targets, idx, 0)
+        for i in range(len(test_targets)):
+            test_targets[i] = 0 if test_targets[i] == 1 else 1
+        test_data = np.reshape(test_data, (len(test_data), -1)) / 255.0
 
     ##################################################################
 
@@ -203,6 +248,10 @@ if __name__ == '__main__':
     # print(labeled_data.shape) # [50, 784]
     l_env = [i for i in range(dataset.data.shape[0]) if i not in l]
     unlabeled_data, unlabeled_targets = dataset.data[l_env], dataset.targets[l_env]
+    if args.dset == 'CIFAR10':
+        labeled_data, labeled_targets = torch.from_numpy(labeled_data), torch.from_numpy(labeled_targets)
+        unlabeled_data, unlabeled_targets = torch.from_numpy(unlabeled_data), torch.from_numpy(unlabeled_targets)
+    # print("Type after conversion:\n", type(labeled_data))
 
     gaal_list = []
     random_list = []
@@ -213,17 +262,23 @@ if __name__ == '__main__':
     for run in range(10):
         print('Now run {}/{}'.format(run + 1, 10))
         oneTrain = TrainLoop(args, device, labeled_data, labeled_targets, test_data, test_targets, id, rt=run + 1)
+        print("Training GAAL ...")
         gaal_list.append(oneTrain.train_gaal())
+        print("Training Random ...")
         random_list.append(oneTrain.train_random(unlabeled_data, unlabeled_targets))
         # print(dataset.data.shape)
+        print("Training Full Supervised ...")
         full_acc, a, b = oneTrain.train_svm(dataset.data, dataset.targets)
         full_list.append(full_acc)
 
     plot_all(total_numlabel, gaal_list, random_list, full_list, args.dset, args.limit, id)
+
     # plot_err(total_numlabel, aver, sd, args.dset, args.limit, id)
 
     # oneTrain = TrainLoop(args, device, labeled_data, labeled_targets, test_data, test_targets, id)
-    #
+    # print(labeled_data.shape)
+    # print(dataset.data.shape)
+    # print(test_data.shape)
     # full_acc, a, b = oneTrain.train_svm(dataset.data, dataset.targets)
-    # # print(dataset.data.shape)
+    # print(dataset.data.shape)
     # print(full_acc)

@@ -6,7 +6,7 @@ class CNN(torch.nn.Module):
         self.conv1 = torch.nn.Conv2d(1, 10, kernel_size=5)
         self.conv2 = torch.nn.Conv2d(10, 20, kernel_size=5)
         self.pooling = torch.nn.MaxPool2d(2)
-        self.fc = torch.nn.Linear(320, 10)
+        self.fc = torch.nn.Linear(320, 2)
         self.relu = torch.nn.ReLU()
 
     def forward(self, x):

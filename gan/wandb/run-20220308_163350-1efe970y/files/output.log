@@ -1,0 +1,11 @@
+
+Files already downloaded and verified
+[1/30][0/391]	Loss_D: 1.6103	Loss_G: 1.9020	D(x): 0.5042	D(G(z)): 0.5606 / 0.1406
+Traceback (most recent call last):
+  File "G:\astar\PyTorch-GAAL\gan\dcgan_pytorch.py", line 309, in <module>
+    main()
+  File "G:\astar\PyTorch-GAAL\gan\dcgan_pytorch.py", line 296, in main
+    train(config, netG, netD, device, trainloader, optimizerG, optimizerD, criterion, epoch, iters)
+  File "G:\astar\PyTorch-GAAL\gan\dcgan_pytorch.py", line 217, in train
+    img_list.append(wandb.Image(vutils.make_grid(fake, padding=2, normalize=True)))
+NameError: name 'img_list' is not defined

@@ -1,0 +1,45 @@
+2022-03-08 15:58:50,335 INFO    MainThread:7228 [internal.py:wandb_internal():92] W&B internal server running at pid: 7228, started at: 2022-03-08 15:58:50.335071
+2022-03-08 15:58:50,337 INFO    WriterThread:7228 [datastore.py:open_for_write():77] open: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\run-1htyrza0.wandb
+2022-03-08 15:58:50,339 DEBUG   SenderThread:7228 [sender.py:send():235] send: header
+2022-03-08 15:58:50,340 DEBUG   SenderThread:7228 [sender.py:send():235] send: run
+2022-03-08 15:58:50,801 DEBUG   HandlerThread:7228 [handler.py:handle_request():141] handle_request: check_version
+2022-03-08 15:58:50,803 INFO    SenderThread:7228 [dir_watcher.py:__init__():169] watching files in: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files
+2022-03-08 15:58:50,804 INFO    SenderThread:7228 [sender.py:_start_run_threads():812] run started: 1htyrza0 with start time 1646726329
+2022-03-08 15:58:50,804 DEBUG   SenderThread:7228 [sender.py:send():235] send: summary
+2022-03-08 15:58:50,804 INFO    SenderThread:7228 [sender.py:_save_file():947] saving file wandb-summary.json with policy end
+2022-03-08 15:58:50,805 DEBUG   SenderThread:7228 [sender.py:send_request():249] send_request: check_version
+2022-03-08 15:58:50,908 DEBUG   HandlerThread:7228 [handler.py:handle_request():141] handle_request: run_start
+2022-03-08 15:58:50,920 DEBUG   HandlerThread:7228 [meta.py:__init__():37] meta init
+2022-03-08 15:58:50,920 DEBUG   HandlerThread:7228 [meta.py:__init__():51] meta init done
+2022-03-08 15:58:50,920 DEBUG   HandlerThread:7228 [meta.py:probe():211] probe
+2022-03-08 15:58:50,968 DEBUG   HandlerThread:7228 [meta.py:_setup_git():201] setup git
+2022-03-08 15:58:51,024 DEBUG   HandlerThread:7228 [meta.py:_setup_git():208] setup git done
+2022-03-08 15:58:51,024 DEBUG   HandlerThread:7228 [meta.py:_save_pip():55] save pip
+2022-03-08 15:58:51,025 DEBUG   HandlerThread:7228 [meta.py:_save_pip():69] save pip done
+2022-03-08 15:58:51,025 DEBUG   HandlerThread:7228 [meta.py:_save_conda():76] save conda
+2022-03-08 15:58:51,811 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_created():217] file/dir created: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\conda-environment.yaml
+2022-03-08 15:58:51,811 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_created():217] file/dir created: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\wandb-summary.json
+2022-03-08 15:58:51,812 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_created():217] file/dir created: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\requirements.txt
+2022-03-08 15:58:53,826 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_modified():230] file/dir modified: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\conda-environment.yaml
+2022-03-08 15:58:53,873 DEBUG   HandlerThread:7228 [meta.py:_save_conda():86] save conda done
+2022-03-08 15:58:53,873 DEBUG   HandlerThread:7228 [meta.py:probe():249] probe done
+2022-03-08 15:58:53,997 DEBUG   HandlerThread:7228 [handler.py:handle_request():141] handle_request: stop_status
+2022-03-08 15:58:53,997 DEBUG   SenderThread:7228 [sender.py:send():235] send: files
+2022-03-08 15:58:53,997 INFO    SenderThread:7228 [sender.py:_save_file():947] saving file wandb-metadata.json with policy now
+2022-03-08 15:58:53,998 DEBUG   SenderThread:7228 [sender.py:send_request():249] send_request: stop_status
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: telemetry
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: telemetry
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,288 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,289 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,289 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,289 DEBUG   SenderThread:7228 [sender.py:send():235] send: config
+2022-03-08 15:58:54,741 INFO    Thread-17 :7228 [upload_job.py:push():137] Uploaded file C:\Users\MSI-PC\AppData\Local\Temp\tmpn09lqe7rwandb\1si5ai9u-wandb-metadata.json
+2022-03-08 15:58:54,826 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_modified():230] file/dir modified: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\conda-environment.yaml
+2022-03-08 15:58:54,827 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_created():217] file/dir created: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\wandb-metadata.json
+2022-03-08 15:58:54,827 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_created():217] file/dir created: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\output.log
+2022-03-08 15:58:56,198 DEBUG   SenderThread:7228 [sender.py:send():235] send: telemetry
+2022-03-08 15:58:56,839 INFO    Thread-11 :7228 [dir_watcher.py:_on_file_modified():230] file/dir modified: G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155849-1htyrza0\files\output.log

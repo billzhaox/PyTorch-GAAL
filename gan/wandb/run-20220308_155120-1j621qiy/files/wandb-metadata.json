@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.19044-SP0",
+    "python": "3.9.7",
+    "heartbeatAt": "2022-03-08T07:51:21.760135",
+    "startedAt": "2022-03-08T07:51:20.070118",
+    "docker": null,
+    "gpu": "NVIDIA GeForce GTX 1660 Ti",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "G:\\astar\\PyTorch-GAAL\\gan\\dcgan_pytorch.py",
+    "codePath": "gan\\dcgan_pytorch.py",
+    "git": {
+        "remote": "git@github.com:billzhaox/PyTorch-GAAL.git",
+        "commit": "f0cad15f759b2138fc5318a48f14155a047acb62"
+    },
+    "email": "862367531@qq.com",
+    "root": "G:/astar/PyTorch-GAAL",
+    "host": "MSI",
+    "username": "MSI-PC",
+    "executable": "G:\\anac\\envs\\pytr\\python.exe"
+}

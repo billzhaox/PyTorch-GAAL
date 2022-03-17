@@ -9,7 +9,7 @@ from torchvision import transforms
 from torchvision import datasets
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from cnn import CNN
+from oracle.cnn import CNN
 
 
 def parse_opt():
@@ -34,11 +34,14 @@ def train(epoch):
     for data in train_bar:
         images, labels = data
         images, labels = images.to(device), labels.to(device)
+        print("aadasd",images.shape)
 
         optimizer.zero_grad()
         outputs = model(images)
         _, predicted = torch.max(outputs.data, dim=1)
         total_correct += torch.eq(predicted, labels).sum().item()
+        # print(outputs)
+        # print(labels)
         loss = criterion(outputs, labels)
         total_loss += loss.item()
         loss.backward()
@@ -97,7 +100,7 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("using {} device.".format(device))
 
-    transform = f.Compose([
+    transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
     ])
@@ -105,11 +108,15 @@ if __name__ == "__main__":
     train_dataset = datasets.MNIST(root='../data/', train=True, download=True, transform=transform)
     idx = (train_dataset.targets == 5) | (train_dataset.targets == 7)
     train_dataset.data, train_dataset.targets = train_dataset.data[idx], train_dataset.targets[idx]
+    for i in range(len(train_dataset.targets)):
+        train_dataset.targets[i] = 0 if train_dataset.targets[i] == 5 else 1
     train_loader = DataLoader(train_dataset, shuffle=True, batch_size=args.batch_size)
 
-    test_dataset = datasets.MNIST(root='../dataset/', train=False, download=True, transform=transform)
+    test_dataset = datasets.MNIST(root='../data/', train=False, download=True, transform=transform)
     idx = (test_dataset.targets == 5) | (test_dataset.targets == 7)
     test_dataset.data, test_dataset.targets = test_dataset.data[idx], test_dataset.targets[idx]
+    for i in range(len(test_dataset.targets)):
+        test_dataset.targets[i] = 0 if test_dataset.targets[i] == 5 else 1
     test_loader = DataLoader(test_dataset, shuffle=False, batch_size=args.batch_size)
 
     model = CNN()

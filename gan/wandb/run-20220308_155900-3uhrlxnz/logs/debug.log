@@ -1,0 +1,46 @@
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Loading settings from C:\Users\MSI-PC\.config\wandb\settings
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Loading settings from G:\astar\PyTorch-GAAL\gan\wandb\settings
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Loading settings from environment variables: {}
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Inferring run settings from compute environment: {'program': '<python with no main file>'}
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Applying login settings: {'api_key': '***REDACTED***'}
+2022-03-08 15:59:00,074 INFO    MainThread:11644 [wandb_setup.py:_flush():75] Applying login settings: {'api_key': '***REDACTED***'}
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [wandb_init.py:_log_setup():405] Logging user logs to G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155900-3uhrlxnz\logs\debug.log
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [wandb_init.py:_log_setup():406] Logging internal logs to G:\astar\PyTorch-GAAL\gan\wandb\run-20220308_155900-3uhrlxnz\logs\debug-internal.log
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [wandb_init.py:init():439] calling init triggers
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [wandb_init.py:init():442] wandb.init called with sweep_config: {}
+config: {}
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [wandb_init.py:init():492] starting backend
+2022-03-08 15:59:00,075 INFO    MainThread:11644 [backend.py:_multiprocessing_setup():99] multiprocessing start_methods=spawn, using: spawn
+2022-03-08 15:59:00,077 INFO    MainThread:11644 [backend.py:ensure_launched():219] starting backend process...
+2022-03-08 15:59:00,083 ERROR   MainThread:11644 [wandb_init.py:init():981] error
+Traceback (most recent call last):
+  File "G:\anac\envs\pytr\lib\site-packages\wandb\sdk\wandb_init.py", line 954, in init
+    run = wi.init()
+  File "G:\anac\envs\pytr\lib\site-packages\wandb\sdk\wandb_init.py", line 499, in init
+    backend.ensure_launched()
+  File "G:\anac\envs\pytr\lib\site-packages\wandb\sdk\backend\backend.py", line 222, in ensure_launched
+    self.wandb_process.start()
+  File "G:\anac\envs\pytr\lib\multiprocessing\process.py", line 121, in start
+    self._popen = self._Popen(self)
+  File "G:\anac\envs\pytr\lib\multiprocessing\context.py", line 327, in _Popen
+    return Popen(process_obj)
+  File "G:\anac\envs\pytr\lib\multiprocessing\popen_spawn_win32.py", line 45, in __init__
+    prep_data = spawn.get_preparation_data(process_obj._name)
+  File "G:\anac\envs\pytr\lib\multiprocessing\spawn.py", line 154, in get_preparation_data
+    _check_not_importing_main()
+  File "G:\anac\envs\pytr\lib\multiprocessing\spawn.py", line 134, in _check_not_importing_main
+    raise RuntimeError('''
+RuntimeError: 
+        An attempt has been made to start a new process before the
+        current process has finished its bootstrapping phase.
+
+        This probably means that you are not using fork to start your
+        child processes and you have forgotten to use the proper idiom
+        in the main module:
+
+            if __name__ == '__main__':
+                freeze_support()
+                ...
+
+        The "freeze_support()" line can be omitted if the program
+        is not going to be frozen to produce an executable.
