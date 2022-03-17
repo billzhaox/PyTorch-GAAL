@@ -28,11 +28,9 @@ python 3.9.7 + pytorch 1.9.0 + torchvision 0.10.0 + cuda 10.1 + cuDNN 7.6.5
 ```
 ## Experiment results
 1. Train on MNIST, test on MNIST. Classifying 5 and 7:
-
 ![Results](doc/img/M.png)
 
 2. Train on MNIST, test on USPS. Classifying 5 and 7: 
-
 ![Results](doc/img/U.png)
 
 ## To be updated
